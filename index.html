@@ -2,89 +2,79 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Random Station</title>
 
   <style>
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #333 0%, #111 45%, #000 100%);
+      background: radial-gradient(circle at top, #333 0%, #111 50%, #000 100%);
       color: white;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 22px;
+      gap: 20px;
       padding: 24px;
       box-sizing: border-box;
     }
 
     h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 26px;
       letter-spacing: 0.08em;
     }
 
-    .station-label {
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      opacity: 0.65;
+    .label {
+      font-size: 12px;
+      opacity: 0.6;
+      letter-spacing: 0.2em;
     }
 
     #player {
       width: 90vw;
       max-width: 960px;
       aspect-ratio: 16 / 9;
-      background: #000;
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.55);
-    }
-
-    .now-playing {
-      width: 90vw;
-      max-width: 960px;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .now-label {
-      font-size: 12px;
-      letter-spacing: 0.2em;
-      opacity: 0.6;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+      background: black;
     }
 
     #nowTitle {
       font-size: 18px;
       font-weight: 700;
+      text-align: center;
+      max-width: 900px;
+      line-height: 1.4;
     }
 
     button {
       font-size: 20px;
-      padding: 15px 38px;
-      border: none;
+      padding: 14px 36px;
       border-radius: 999px;
+      border: none;
       cursor: pointer;
+      font-weight: 700;
       background: white;
       color: #111;
-      font-weight: 700;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transition: transform 0.1s ease;
     }
 
-    button:hover {
-      transform: translateY(-1px);
+    button:active {
+      transform: scale(0.98);
     }
 
     button:disabled {
       opacity: 0.5;
-      cursor: default;
     }
 
-    .note {
+    .small {
       font-size: 12px;
-      opacity: 0.45;
+      opacity: 0.4;
       text-align: center;
     }
   </style>
@@ -92,33 +82,31 @@
 
 <body>
 
-  <div class="station-label">YOUTUBE RANDOM STATION</div>
+  <div class="label">YOUTUBE RANDOM STATION</div>
   <h1>Random Station</h1>
 
   <div id="player"></div>
 
-  <div class="now-playing">
-    <div class="now-label">NOW PLAYING</div>
-    <div id="nowTitle">再生ボタンを押してください</div>
-  </div>
+  <div class="label">NOW PLAYING</div>
+  <div id="nowTitle">再生ボタンを押してください</div>
 
   <button id="playBtn">▶ 再生</button>
 
-  <div class="note">
-    最初の動画だけランダムに選ばれ、その後はプレイリスト順に再生されます
+  <div class="small">
+    最初はランダム再生、その後はプレイリスト順に再生されます
   </div>
 
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     const PLAYLIST_ID = "PLcopHZdckrjT63rBpTPrzCa59g-0cWOmf";
-
-    // 今170本くらいとのことなので、少し多めに設定
-    // 将来増えても、しばらく触らなくてOK
     const MAX_INDEX = 300;
 
     let player;
-    let started = false;
+    let isPlaying = false;
+
+    const playBtn = document.getElementById("playBtn");
+    const nowTitle = document.getElementById("nowTitle");
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player("player", {
@@ -138,9 +126,17 @@
       });
     }
 
-    document.getElementById("playBtn").addEventListener("click", () => {
-      if (!player || started) return;
+    playBtn.addEventListener("click", () => {
+      if (!player) return;
 
+      if (!isPlaying) {
+        startRandom();
+      } else {
+        stop();
+      }
+    });
+
+    function startRandom() {
       const randomIndex = Math.floor(Math.random() * MAX_INDEX);
 
       player.loadPlaylist({
@@ -149,25 +145,39 @@
         index: randomIndex
       });
 
-      started = true;
-      document.getElementById("playBtn").disabled = true;
-      document.getElementById("playBtn").textContent = "再生中";
-      document.getElementById("nowTitle").textContent = "選曲中...";
-    });
+      isPlaying = true;
+      playBtn.textContent = "■ 停止";
+      nowTitle.textContent = "選曲中...";
+    }
+
+    function stop() {
+      player.stopVideo();
+
+      isPlaying = false;
+      playBtn.textContent = "▶ 再生";
+      nowTitle.textContent = "停止中";
+    }
 
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
-        updateNowPlaying();
+        isPlaying = true;
+        playBtn.textContent = "■ 停止";
+        updateTitle();
+      }
+
+      if (event.data === YT.PlayerState.ENDED) {
+        isPlaying = false;
+        playBtn.textContent = "▶ 再生";
+        nowTitle.textContent = "再生ボタンを押してください";
       }
     }
 
-    function updateNowPlaying() {
+    function updateTitle() {
       try {
         const data = player.getVideoData();
-        const title = data && data.title ? data.title : "タイトル取得中...";
-        document.getElementById("nowTitle").textContent = title;
+        nowTitle.textContent = data.title || "再生中";
       } catch (e) {
-        document.getElementById("nowTitle").textContent = "再生中";
+        nowTitle.textContent = "再生中";
       }
     }
   </script>
