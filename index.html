@@ -16,9 +16,9 @@
       align-items: center;
       justify-content: center;
       gap: 20px;
-      padding: 24px;
+      padding: 32px 24px 80px;
       box-sizing: border-box;
-      overflow: hidden;
+      overflow-x: hidden;
       background: #000;
     }
 
@@ -56,6 +56,7 @@
       overflow: hidden;
       box-shadow: 0 24px 90px rgba(0,0,0,0.7);
       background: black;
+      flex-shrink: 0;
     }
 
     .label {
@@ -69,13 +70,19 @@
       font-weight: 700;
       text-align: center;
       max-width: 900px;
-      line-height: 1.4;
+      line-height: 1.5;
       text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+      min-height: 2.8em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     button {
-      font-size: 20px;
-      padding: 14px 36px;
+      font-size: 24px;
+      width: 64px;
+      height: 64px;
+      padding: 0;
       border-radius: 999px;
       border: none;
       cursor: pointer;
@@ -83,10 +90,26 @@
       background: white;
       color: #111;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+      margin-bottom: 24px;
     }
 
     button:active {
       transform: scale(0.98);
+    }
+
+    @media (max-height: 720px) {
+      body {
+        justify-content: flex-start;
+      }
+
+      #logo {
+        width: 200px;
+      }
+
+      button {
+        margin-bottom: 48px;
+      }
     }
   </style>
 </head>
@@ -109,8 +132,6 @@
 
   <script>
     const PLAYLIST_ID = "PLcopHZdckrjT63rBpTPrzCa59g-0cWOmf";
-
-    // getPlaylistで本数が取れなかった時だけ使う予備の数字
     const FALLBACK_PLAYLIST_LENGTH = 170;
 
     let player;
@@ -184,7 +205,7 @@
 
       isPlaying = false;
       playBtn.textContent = "▶";
-      nowTitle.textContent = "停止中";
+      nowTitle.textContent = "ランダム再生";
       bg.style.opacity = "0.2";
     }
 
