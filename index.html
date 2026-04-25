@@ -101,9 +101,9 @@
   <div id="player"></div>
 
   <div class="label">NOW PLAYING</div>
-  <div id="nowTitle">再生ボタンを押してください</div>
+  <div id="nowTitle">ランダム再生</div>
 
-  <button id="playBtn">▶ 再生</button>
+  <button id="playBtn">▶</button>
 
   <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -140,7 +140,7 @@
     }
 
     function onPlayerReady() {
-      nowTitle.textContent = "再生ボタンを押してください";
+      nowTitle.textContent = "ランダム再生";
     }
 
     playBtn.addEventListener("click", () => {
@@ -175,15 +175,15 @@
       });
 
       isPlaying = true;
-      playBtn.textContent = "■ 停止";
-      nowTitle.textContent = "選曲中...";
+      playBtn.textContent = "■";
+      nowTitle.textContent = "選択中";
     }
 
     function stop() {
       player.stopVideo();
 
       isPlaying = false;
-      playBtn.textContent = "▶ 再生";
+      playBtn.textContent = "▶";
       nowTitle.textContent = "停止中";
       bg.style.opacity = "0.2";
     }
@@ -191,7 +191,7 @@
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
         isPlaying = true;
-        playBtn.textContent = "■ 停止";
+        playBtn.textContent = "■";
         updateNowPlaying();
       }
     }
