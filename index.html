@@ -22,6 +22,7 @@
       background: #000;
     }
 
+    /* 背景サムネ */
     #bg {
       position: fixed;
       inset: 0;
@@ -31,26 +32,22 @@
       transform: scale(1.12);
       opacity: 0.45;
       z-index: -2;
-      transition: background-image 0.8s ease, opacity 0.8s ease;
+      transition: background-image 0.8s ease;
     }
 
     #overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at top, rgba(40,40,40,0.45), rgba(0,0,0,0.92));
+      background: radial-gradient(circle at top, rgba(40,40,40,0.4), rgba(0,0,0,0.9));
       z-index: -1;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 26px;
-      letter-spacing: 0.08em;
-    }
-
-    .label {
-      font-size: 12px;
-      opacity: 0.65;
-      letter-spacing: 0.2em;
+    /* ロゴ */
+    #logo {
+      width: 260px;
+      max-width: 65vw;
+      opacity: 0.95;
+      filter: drop-shadow(0 6px 20px rgba(0,0,0,0.6));
     }
 
     #player {
@@ -59,8 +56,14 @@
       aspect-ratio: 16 / 9;
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 24px 90px rgba(0,0,0,0.75);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.7);
       background: black;
+    }
+
+    .label {
+      font-size: 12px;
+      opacity: 0.6;
+      letter-spacing: 0.2em;
     }
 
     #nowTitle {
@@ -81,7 +84,7 @@
       font-weight: 700;
       background: white;
       color: #111;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     button:active {
@@ -101,8 +104,8 @@
   <div id="bg"></div>
   <div id="overlay"></div>
 
-  <div class="label">YOUTUBE RANDOM STATION</div>
-  <h1>Random Station</h1>
+  <!-- ロゴ表示 -->
+  <img src="logo.png" id="logo" alt="logo">
 
   <div id="player"></div>
 
@@ -190,13 +193,11 @@
     function updateNowPlaying() {
       try {
         const data = player.getVideoData();
-
         nowTitle.textContent = data.title || "再生中";
 
         if (data.video_id) {
-          const thumbnailUrl = `https://img.youtube.com/vi/${data.video_id}/maxresdefault.jpg`;
-          bg.style.backgroundImage = `url("${thumbnailUrl}")`;
-          bg.style.opacity = "0.45";
+          const url = `https://img.youtube.com/vi/${data.video_id}/maxresdefault.jpg`;
+          bg.style.backgroundImage = `url("${url}")`;
         }
       } catch (e) {
         nowTitle.textContent = "再生中";
