@@ -1,8 +1,11 @@
 <!doctype html>
+
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <title>Podcast Radio</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
@@ -17,8 +20,8 @@
     }
 
     .container {
-      width: 90%;
-      max-width: 900px;
+      width: 95%;
+      max-width: 1280px; /* ← いい感じの大きさ */
     }
 
     h1 {
@@ -32,21 +35,29 @@
 
     #player {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 9; /* ← 1920×1080と同じ比率 */
       background: #000;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
     button {
-      margin-top: 16px;
+      margin-top: 20px;
       font-size: 18px;
-      padding: 12px 20px;
+      padding: 12px 24px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       background: #fff;
       color: #000;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.85;
     }
   </style>
+
 </head>
 
 <body>
@@ -57,7 +68,8 @@
 
   <div id="player"></div>
 
-  <button onclick="start()">▶ 再生する</button>
+<button onclick="start()">▶ 再生する</button>
+
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -69,7 +81,7 @@ const VIDEO_COUNT = 170;
 let player;
 let started = false;
 
-// プレイヤー準備
+// YouTubeプレイヤー初期化
 function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
     playerVars: {
@@ -82,7 +94,7 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
-// 再生スタート（ユーザー操作必要対策）
+// 再生スタート
 function start() {
   if (started) return;
 
