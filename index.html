@@ -22,7 +22,6 @@
       background: #000;
     }
 
-    /* 背景サムネ */
     #bg {
       position: fixed;
       inset: 0;
@@ -42,7 +41,6 @@
       z-index: -1;
     }
 
-    /* ロゴ */
     #logo {
       width: 260px;
       max-width: 65vw;
@@ -90,12 +88,6 @@
     button:active {
       transform: scale(0.98);
     }
-
-    .small {
-      font-size: 12px;
-      opacity: 0.45;
-      text-align: center;
-    }
   </style>
 </head>
 
@@ -104,7 +96,6 @@
   <div id="bg"></div>
   <div id="overlay"></div>
 
-  <!-- ロゴ表示 -->
   <img src="logo.png" id="logo" alt="logo">
 
   <div id="player"></div>
@@ -114,15 +105,13 @@
 
   <button id="playBtn">▶ 再生</button>
 
-  <div class="small">
-    最初はランダム再生、その後はプレイリスト順に再生されます
-  </div>
-
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     const PLAYLIST_ID = "PLcopHZdckrjT63rBpTPrzCa59g-0cWOmf";
-    const MAX_INDEX = 300;
+
+    // getPlaylistで本数が取れなかった時だけ使う予備の数字
+    const FALLBACK_PLAYLIST_LENGTH = 170;
 
     let player;
     let isPlaying = false;
@@ -144,9 +133,14 @@
           modestbranding: 1
         },
         events: {
+          onReady: onPlayerReady,
           onStateChange: onPlayerStateChange
         }
       });
+    }
+
+    function onPlayerReady() {
+      nowTitle.textContent = "再生ボタンを押してください";
     }
 
     playBtn.addEventListener("click", () => {
@@ -159,8 +153,20 @@
       }
     });
 
+    function getPlaylistLength() {
+      try {
+        const playlist = player.getPlaylist();
+        if (Array.isArray(playlist) && playlist.length > 0) {
+          return playlist.length;
+        }
+      } catch (e) {}
+
+      return FALLBACK_PLAYLIST_LENGTH;
+    }
+
     function startRandom() {
-      const randomIndex = Math.floor(Math.random() * MAX_INDEX);
+      const playlistLength = getPlaylistLength();
+      const randomIndex = Math.floor(Math.random() * playlistLength);
 
       player.loadPlaylist({
         listType: "playlist",
@@ -198,6 +204,7 @@
         if (data.video_id) {
           const url = `https://img.youtube.com/vi/${data.video_id}/maxresdefault.jpg`;
           bg.style.backgroundImage = `url("${url}")`;
+          bg.style.opacity = "0.45";
         }
       } catch (e) {
         nowTitle.textContent = "再生中";
