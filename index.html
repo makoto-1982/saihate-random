@@ -1,115 +1,176 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <title>Podcast Radio</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Random Station</title>
 
   <style>
     body {
       margin: 0;
-      background: #111;
-      color: white;
-      font-family: system-ui, sans-serif;
-      display: grid;
-      place-items: center;
       min-height: 100vh;
-      text-align: center;
-    }
-
-    .container {
-      width: 95%;
-      max-width: 1280px; /* ← いい感じの大きさ */
+      background: radial-gradient(circle at top, #333 0%, #111 45%, #000 100%);
+      color: white;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      padding: 24px;
+      box-sizing: border-box;
     }
 
     h1 {
-      margin-bottom: 8px;
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.08em;
     }
 
-    p {
-      opacity: 0.7;
-      margin-bottom: 16px;
+    .station-label {
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      opacity: 0.65;
     }
 
     #player {
-      width: 100%;
-      aspect-ratio: 16 / 9; /* ← 1920×1080と同じ比率 */
+      width: 90vw;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
       background: #000;
-      border-radius: 12px;
+      border-radius: 18px;
       overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+    }
+
+    .now-playing {
+      width: 90vw;
+      max-width: 960px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .now-label {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      opacity: 0.6;
+    }
+
+    #nowTitle {
+      font-size: 18px;
+      font-weight: 700;
     }
 
     button {
-      margin-top: 20px;
-      font-size: 18px;
-      padding: 12px 24px;
-      border-radius: 999px;
+      font-size: 20px;
+      padding: 15px 38px;
       border: none;
+      border-radius: 999px;
       cursor: pointer;
-      background: #fff;
-      color: #000;
-      transition: 0.2s;
+      background: white;
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     }
 
     button:hover {
-      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .note {
+      font-size: 12px;
+      opacity: 0.45;
+      text-align: center;
     }
   </style>
-
 </head>
 
 <body>
 
-<div class="container">
-  <h1>🎧 Podcast Radio</h1>
-  <p>ランダムな回から自動再生されます</p>
+  <div class="station-label">YOUTUBE RANDOM STATION</div>
+  <h1>Random Station</h1>
 
   <div id="player"></div>
 
-<button onclick="start()">▶ 再生する</button>
+  <div class="now-playing">
+    <div class="now-label">NOW PLAYING</div>
+    <div id="nowTitle">再生ボタンを押してください</div>
+  </div>
 
-</div>
+  <button id="playBtn">▶ 再生</button>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+  <div class="note">
+    最初の動画だけランダムに選ばれ、その後はプレイリスト順に再生されます
+  </div>
 
-<script>
-const PLAYLIST_ID = "PLcopHZdckrjT63rBpTPrzCa59g-0cWOmf";
-const VIDEO_COUNT = 170;
+  <script src="https://www.youtube.com/iframe_api"></script>
 
-let player;
-let started = false;
+  <script>
+    const PLAYLIST_ID = "PLcopHZdckrjT63rBpTPrzCa59g-0cWOmf";
 
-// YouTubeプレイヤー初期化
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    playerVars: {
-      listType: 'playlist',
-      list: PLAYLIST_ID,
-      controls: 1,
-      rel: 0,
-      modestbranding: 1
+    // 今170本くらいとのことなので、少し多めに設定
+    // 将来増えても、しばらく触らなくてOK
+    const MAX_INDEX = 300;
+
+    let player;
+    let started = false;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player("player", {
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          listType: "playlist",
+          list: PLAYLIST_ID,
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          modestbranding: 1
+        },
+        events: {
+          onStateChange: onPlayerStateChange
+        }
+      });
     }
-  });
-}
 
-// 再生スタート
-function start() {
-  if (started) return;
+    document.getElementById("playBtn").addEventListener("click", () => {
+      if (!player || started) return;
 
-  const randomIndex = Math.floor(Math.random() * VIDEO_COUNT);
+      const randomIndex = Math.floor(Math.random() * MAX_INDEX);
 
-  player.loadPlaylist({
-    list: PLAYLIST_ID,
-    listType: 'playlist',
-    index: randomIndex,
-    startSeconds: 0
-  });
+      player.loadPlaylist({
+        listType: "playlist",
+        list: PLAYLIST_ID,
+        index: randomIndex
+      });
 
-  started = true;
-}
-</script>
+      started = true;
+      document.getElementById("playBtn").disabled = true;
+      document.getElementById("playBtn").textContent = "再生中";
+      document.getElementById("nowTitle").textContent = "選曲中...";
+    });
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        updateNowPlaying();
+      }
+    }
+
+    function updateNowPlaying() {
+      try {
+        const data = player.getVideoData();
+        const title = data && data.title ? data.title : "タイトル取得中...";
+        document.getElementById("nowTitle").textContent = title;
+      } catch (e) {
+        document.getElementById("nowTitle").textContent = "再生中";
+      }
+    }
+  </script>
 
 </body>
 </html>
